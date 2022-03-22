@@ -14,16 +14,17 @@ from tzlocal import get_localzone
 
 # made by lightbulb 💡
 
-# TODO
+# TODO - tbh probably never going to get to these
 # persistent player join log
 # better taskbar icon/window icon
 # dynamic window sizing
 
-
 ### SETTINGS ###
 update_frequency_ms = 1000
-logpath = "%AppData%\\..\\LocalLow\\VRChat\\vrchat\\"
 ################
+# you shouldn't have to touch any of these
+logpath = "%AppData%\\..\\LocalLow\\VRChat\\vrchat\\"
+#"%AppData%\..\LocalLow\VRChat\vrchat\"
 player_list = []
 # this is probably more reliable than "OnPlayerJoined"
 join_msg = "[Behaviour] Initialized PlayerAPI"
@@ -111,7 +112,6 @@ def follow(thefile):
         if not line:
             time.sleep(0.1)
             continue
-
         yield line
 
 
@@ -142,6 +142,7 @@ def update_playerlist():
     txtbox.delete("1.0", END)
 
     table = prettytable.PrettyTable(header=True, vrules=prettytable.FRAME, border=False, align="l", padding_width=2)
+    # ya idk alignment is weird, im sure not all of this is needed but it works
     table.align = "l"
     table.field_names = ["Users-"+str(len(player_list)), "Joined", "TimeWithU"]
     table.align["Users-"+str(len(player_list))] = "l"
@@ -176,7 +177,7 @@ if __name__ == "__main__":
     txtbox.grid(row=0, column=0, sticky='NSEW')
     txtbox.grid_columnconfigure(0, weight=1)
     txtbox.config(state=DISABLED)  # make it readonly
-    txtbox.configure(font=font.Font(family="Consolas", size=8))
+    txtbox.configure(font=font.Font(family="Consolas", size=8), background="black", foreground="white") # only use monospace fonts
     ttk.Button(root, text="Quit", command=lambda: die(logwatcher)).grid(column=0, row=1, pady=10)
 
     # root.tk.call('wm', 'iconphoto', root._w, PhotoImage(data=ico))
