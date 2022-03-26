@@ -25,7 +25,8 @@ update_frequency_ms = 1000
 # you shouldn't have to touch any of these
 logpath = "%AppData%\\..\\LocalLow\\VRChat\\vrchat\\"
 #"%AppData%\..\LocalLow\VRChat\vrchat\"
-player_list = []
+#player_list = []
+player_list = [{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob1", "joined":1648253578},{"name":"bob5", "joined":1648253578},{"name":"bob4", "joined":1648253578},{"name":"bob3", "joined":1648253578},{"name":"bob2", "joined":1648253578}]
 # this is probably more reliable than "OnPlayerJoined"
 join_msg = "[Behaviour] Initialized PlayerAPI"
 left_msg = "[Behaviour] OnPlayerLeft "
@@ -137,9 +138,14 @@ def is_user_in_list(username):
 
 def update_playerlist():
     root.after(update_frequency_ms, update_playerlist)
+    how_many_on_left_side = int(len(player_list) / 2) + (len(player_list) % 2 > 0)
+    how_many_on_right_side = len(player_list) - how_many_on_left_side
+
     # allow changing text
     txtbox.config(state=NORMAL)
     txtbox.delete("1.0", END)
+    txtboxr.config(state=NORMAL)
+    txtboxr.delete("1.0", END)
 
     table = prettytable.PrettyTable(header=True, vrules=prettytable.FRAME, border=False, align="l", padding_width=2)
     # ya idk alignment is weird, im sure not all of this is needed but it works
@@ -148,13 +154,28 @@ def update_playerlist():
     table.align["Users-"+str(len(player_list))] = "l"
     table.align["Joined"] = "l"
     table.align["TimeWithU"] = "l"
-    first, last = txtbox.yview()
+
+    tabler = prettytable.PrettyTable(header=True, vrules=prettytable.FRAME, border=False, align="l", padding_width=2)
+    # ya idk alignment is weird, im sure not all of this is needed but it works
+    tabler.align = "l"
+    tabler.field_names = ["Users-"+str(len(player_list)), "Joined", "TimeWithU"]
+    tabler.align["Users-"+str(len(player_list))] = "l"
+    tabler.align["Joined"] = "l"
+    tabler.align["TimeWithU"] = "l"
+
+    counter = 0
     for player in player_list:
-        table.add_row([player["name"], get_timestamp(player["joined"]), get_time_with_you(player["joined"])])
+        if counter < how_many_on_left_side:
+            table.add_row([player["name"], get_timestamp(player["joined"]), get_time_with_you(player["joined"])])
+            counter += 1
+        else:
+            tabler.add_row([player["name"], get_timestamp(player["joined"]), get_time_with_you(player["joined"])])
+
     txtbox.insert(END, table)
     txtbox.config(state=DISABLED)
+    txtboxr.insert(END, tabler)
+    txtboxr.config(state=DISABLED)
     root.update()
-    txtbox.yview_moveto(first)
 
 
 def die(lw):
@@ -166,22 +187,32 @@ def die(lw):
 if __name__ == "__main__":
     logwatcher = LogWatcher()
 
-    root.geometry("390x750")
+    root.geometry("500x600")
     root.attributes('-alpha', 0.9)
     root.title("PlayerList 💡")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(0, weight=1)
+    root.grid_columnconfigure(1, weight=1)
 
     root.grid()
-    txtbox = scrolledtext.ScrolledText(root, wrap="none")
-    txtbox.grid(row=0, column=0, sticky='NSEW')
+    # txtbox = scrolledtext.ScrolledText(root, wrap="none")
+    txtbox = Text(root, wrap="none")
+    txtbox.grid(row=0, column=0, sticky='NSW')
     txtbox.grid_columnconfigure(0, weight=1)
     txtbox.config(state=DISABLED)  # make it readonly
     txtbox.configure(font=font.Font(family="Consolas", size=8), background="black", foreground="white") # only use monospace fonts
+
+    txtboxr = scrolledtext.ScrolledText(root, wrap="none")
+    txtboxr.grid(row=0, column=1, sticky='NSE')
+    txtboxr.grid_columnconfigure(1, weight=1)
+    txtboxr.config(state=DISABLED)  # make it readonly
+    txtboxr.configure(font=font.Font(family="Consolas", size=8), background="black", foreground="white") # only use monospace fonts
+
     ttk.Button(root, text="Quit", command=lambda: die(logwatcher)).grid(column=0, row=1, pady=10)
 
     # root.tk.call('wm', 'iconphoto', root._w, PhotoImage(data=ico))
 
     root.protocol("WM_DELETE_WINDOW", lambda: die(logwatcher))
     root.after(update_frequency_ms, update_playerlist)
+    update_playerlist()
     root.mainloop()
