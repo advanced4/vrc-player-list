@@ -157,14 +157,14 @@ def update_playerlist():
     table.border = False
     table.align = "l"
     table.padding_width = 2
-    table.field_names = ["User", "Joined", "Time With U"]
+    table.field_names = ["Users -" + str(len(player_list)), "Joined", "Time With U"]
 
     tabler = PrettyTable()
     tabler.header = True
     tabler.border = False
     tabler.align = "l"
     tabler.padding_width = 2
-    tabler.field_names = ["User", "Joined", "Time With U"]
+    tabler.field_names = ["Users -" + str(len(player_list)), "Joined", "Time With U"]
 
     for idx, player in enumerate(player_list):
         row = [player["name"], get_timestamp(player["joined"]), get_time_with_you(player["joined"])]
