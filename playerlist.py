@@ -21,7 +21,7 @@ dynamic_sizing = True  # Set to False for fixed window size
 
 player_list = []
 join_msg = "[Behaviour] Initialized PlayerAPI"
-left_msg = "[Behaviour] Unregistering "
+left_msg = "[Behaviour] OnPlayerLeft "
 new_world_msg = "[Behaviour] Finished entering world"
 local_tz = get_localzone()
 current_file = None
@@ -69,8 +69,15 @@ class LogWatcher(threading.Thread):
                 if left_msg in parseme:
                     # Someone left
                     try:
-                        playername = parseme.split(left_msg)[1]
+                        # Extract the part of the string after 'left_msg'
+                        remaining_line = parseme.split(left_msg, 1)[1]
+
+                        # Remove any trailing information in parentheses (e.g., user ID)
+                        playername = remaining_line.split(' (')[0].strip()
+
                         print("Player Left: " + playername)
+
+                        # Update the player list if the player exists in it
                         if is_user_in_list(playername):
                             player_list = [i for i in player_list if i['name'] != playername]
                     except IndexError as e:
@@ -188,10 +195,10 @@ def setup_window():
     # Set window properties based on dynamic_sizing setting
     if dynamic_sizing:
         root.resizable(True, True)
-        root.geometry("500x600")  # Initial size; can be resized
+        root.geometry("675x700")  # Initial size; can be resized
     else:
         root.resizable(False, False)
-        root.geometry("500x600")  # Fixed size
+        root.geometry("675x700")  # Fixed size
 
 if __name__ == "__main__":
     logwatcher = LogWatcher()
